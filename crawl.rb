@@ -1,11 +1,11 @@
 require "iconv"
 require "hpricot"
-require "open-uri"
+require "net/http"
 
 class Spider
     def initialize(url)
         @keywords = Hash.new(0)
-        @url = url
+        @url = URI.parse(url)
         @common = [
         'the','be','to','of','and','a','in','that','have','i','it','for','not',
         'on','with','as','you','do','at','this','but','by','from','they',
@@ -17,9 +17,10 @@ class Spider
         ]
     end
     def crawl()
-        f = open(@url)
-        f.rewind
-        doc = Hpricot(Iconv.conv('utf-8',f.charset,f.readlines.join("\n")))
+        http = Net::HTTP.new(@url.host, @url.port)
+        path = @url.path != "" ? @url.path : '/'
+        result = http.get(path)
+        doc = Hpricot(result.body)
         content = doc.search('body')
         if content.empty?
             content = doc.search('BODY')
