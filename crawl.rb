@@ -1,4 +1,3 @@
-require "iconv"
 require "hpricot"
 require "net/http"
 
